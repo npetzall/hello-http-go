@@ -1,21 +1,25 @@
 language: go
-
 go:
-  - 1.7.3
-
+- 1.7.3
 script:
-  - if [ "${TRAVIS_TAG}" == "" ]; then
-      export VERSION=`git rev-parse --abbrev-ref HEAD`;
-    else
-      export VERSION=${TRAVIS_TAG:1};
-    fi;
-    export BUILD=`git rev-parse HEAD`;
-    echo ${VERSION} ${BUILD}
-  - make build;
-  - make test;
-  - if [ "${VERSION}" != "HEAD" ]; then
-      make dist;
-    fi;
-
+- if [ "${TRAVIS_TAG}" == "" ]; then export VERSION=HEAD;
+  else export VERSION=${TRAVIS_TAG:1}; fi; export BUILD=`git rev-parse HEAD`; echo
+  ${VERSION} ${BUILD}
+- make build;
+- make test;
+- if [ "${VERSION}" != "HEAD" ]; then make dist; fi;
 notifications:
   email: false
+deploy:
+  provider: releases
+  api_key:
+    secure: aM92B9FJoRebhMpc6ffHSv7HEUFB+Q3JLDYufxrVzTwy7JhQ+Z1W7DtW3U9Dz7B1s7zj4glhv+BDkrAYrzmP54qdg5NDhzXoTQnA+BrDEGw1ll21GVexyYbEIUxUoUwFYyjudW83DiTUk2IaD5w3CgjkDrViVK/oe7pIQlNzrhgad17g8g1hp9UuFpJLAsPDwj44Ixl1/zHw5kSF8tAW2xrmaF4sX2NCshFrEhrFDPaxi70zN+NgHrX8DLsy+Q4U1xBM+xDcAx2tfdMBJS8mmz+39FjEqUk405XXb9P7j+nDgfPj5gc/F9bzHXclJsi9tgrlQVM/gIgHGl5UBBiuXpWbCMDYYodha2YUi11uXXR/r1JIm1ihib6kby1lSV79Xsg4ebIyUZrOTgImbQNpZwSMzQdd3+0GrNXJupBofJPF1DrcmraeFYtNgp/QNgb2FqeSEssQVMp5jR3DcOgwCksOt+yPx9Q730PcOQ2HOmQ2TygmWcGoLc8jGhICtJsXXAqvkbW1qdpYWlk6VmtDsmUx+LabQZ5zqPRi/8nZY/tKrUOQkaZaOTeZbDJKgqACmWxFb7Ha0bOwLd1koA8pss3o9/gMBOLFhnqIXjB04YCEFHUY14d8YGR8uzs71pU3gCZuQwJc4J3txYmSeWAj1bQ4DpPCmGAuV0gb2zJ/JHk=
+  skip_cleanup: true
+  overwrite: true
+  file:
+    - dist/hello-http-go-${VERSION}-linux_amd64.tar.gz
+    - dist/hello-http-go-${VERSION}-linux_arm.tar.gz
+    - dist/hello-http-go-${VERSION}-darwin_amd64.tar.gz
+  on:
+    repo: npetzall/hello-http-go
+    tags: true

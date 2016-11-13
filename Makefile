@@ -27,7 +27,7 @@ test:
 
 clean:
 	$(call msg,"Clean directory")
-	rm -f bin/hello-http-go
+	rm -rf bin
 	rm -rf dist
 .PHONY: clean
 
