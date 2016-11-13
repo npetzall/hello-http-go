@@ -6,11 +6,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
-var port = flag.String("port", "3000", "Specify port for http server")
-var text = flag.String("text", "Hello", "Specify the response text")
+var (
+	Version string
+	Build   string
+)
+
+var (
+	version = flag.Bool("version", false, "Version of hello-http-go")
+	port    = flag.String("port", "3000", "Specify port for http server")
+	text    = flag.String("text", "Hello", "Specify the response text")
+)
 
 type response struct {
 	Text string `json:"text"`
@@ -27,6 +36,12 @@ func answer(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.Parse()
+
+	if *version {
+		fmt.Printf("hello-http-go [version: %s, build: %s]\n", Version, Build)
+		os.Exit(0)
+	}
 	http.HandleFunc("/", answer)
 	log.Printf("Server listening to port: %s with text: %s\n", *port, *text)
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
