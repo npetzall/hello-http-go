@@ -13,7 +13,7 @@ script:
     echo ${VERSION} ${BUILD}
   - make build;
   - make test;
-  - if [ "${VERSION}" != "HEAD"]; then
+  - if [ "${VERSION}" != "HEAD" ]; then
       make dist;
     fi;
 
