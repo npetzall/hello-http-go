@@ -11,11 +11,11 @@ script:
     fi;
     export BUILD=`git rev-parse HEAD`;
     echo ${VERSION} ${BUILD}
-    - make build;
-    - make test;
-    - if [ "${VERSION}" != "HEAD"]; then
-        make dist;
-      fi;
+  - make build;
+  - make test;
+  - if [ "${VERSION}" != "HEAD"]; then
+      make dist;
+    fi;
 
 notifications:
   email: false
