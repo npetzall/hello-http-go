@@ -63,6 +63,7 @@ docker-build: build-all
 .PHONY: docker-build
 
 docker-push: docker-build
+	$(call msg, "Login to docker as $DOCKER_USER")
 	@docker login -u $DOCKER_USER -p $DOCKER_PASS
 	docker tag ${REPO}:${BUILD} ${REPO}:${VERSION}
 	docker push ${REPO}
