@@ -1,5 +1,7 @@
+APP									= hello-http-go
+REPO								= npetzall/hello-http-go
 VERSION 						?= HEAD
-BUILD               ?= $(shell git rev-parse HEAD)
+BUILD               ?= $(shell git rev-parse --short=8 HEAD)
 
 PLATFORMS           = linux_amd64 linux_arm darwin_amd64
 
@@ -55,3 +57,18 @@ notHEAD:
 	 		echo "Not allowed with VERSION == HEAD"; \
 			exit 1; \
 		fi
+
+docker-build: build-all
+	docker build -f Dockerfile -t ${REPO}:${BUILD} --build-arg repo=${REPO} --build-arg build=${BUILD} .
+.PHONY: docker-build
+
+docker-push: docker-build
+	@docker login -u $DOCKER_USER -p $DOCKER_PASS
+	docker tag ${REPO}:${BUILD} ${REPO}:${VERSION}
+	docker push ${REPO}
+.PHONY: docker-push
+
+docker-push-release: docker-build
+	docker tag ${REPO}:${BUILD} ${REPO}:latest
+	docker push ${REPO}:latest
+.PHONY: docker-push-release

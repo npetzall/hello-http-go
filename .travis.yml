@@ -1,25 +1,39 @@
+sudo: required
+services:
+  - docker
 language: go
 go:
 - 1.7.3
+env:
+  global:
+  - secure: Y78bqRb/JLyvogmLQl+bLCmxQhBWXSRQJG2rql6blJTOpt+tI+JsrQOZxNaqEdY1i7Geo3ypQp8U9gNp36oCE2iTVsSTFd1djhkhj9aRvlv2SdrHznAh2cplbthGovb3xHnrn6mkex6/+N4azH3Pl5RjDcmsFcGrv6ZtLc+5KNr7GhvcB5YjLMvjEbilfi6ZMB5AFvByRx0vmQtT/b36hNstGzDXF/sTE8E2eLw5Zf2W+pcqiXfeyW0PgYfuL7IK9Kt99AWVtw4XNiRND7jMcgxEaXIzoOTMAs1/dUmKSr9WKTs80YPZQf3vSI3TDGkQmYafkjguZKAJFdCoEv83Pah5gu0L2xsJXa6ntk/foHcnJSt5gg6fAyr7fc0GLg5ndOljzRp6MShzY42gc9cOqRhQlsuIFHO/hu8PTtQWJDxbDhm7wxjs/kPpQQK+bzmmwsIViZNNQ/wSzUkGgNzWczlxf+hWqng86oU46d2BfFBVxlM3yELSqw3Ul0nWlo7es6YHjzZYsvVDTSvz/ZyC4DB3sJvlZHHVNBcQ5HP/5GZidONO/11U0hGMUvv77D39r8n9qkmXtByFbLxm3pk25S7YcD/Ci6ds5R7FmVMPk/QpT0wmdbdQ9VtBkFtVRIqVNolh3Efnv1FNF73q1KQlaqPbckeQQ4z8K5wludEMNUc=
+  - secure: Op6Ro7XF+lUKs5c+FTAC7KFabXmegb7cB+MZPihdYyjnGk58OHfKqdZygPX6VwC/6raZKqpDoYTsCms7MsVjCQSWATCHampLzv5Wn5s4EccyoUEbJP4Bc1qCH5H+9jun+sAa1LrkLY7+VTi2dEKKdmDraBXN4wM+2YK8Y114SRrtK0JGCrEk1h/Ncwkv4H4oicj0qiBsZmLFAf1/XhmbLljEBR9WWtxD13I6Qv9J23NcpcbguD2esnj3iTQG4Lfk0rQTHqVAQfC8qO6i97DECqMC5DUOSM0tYsIJUSeMdNdyfS7OxkdWhwR4sulDNN5Sn4wgl/zKCzBHVnytKFJVffXWFDCzl+G/aGA0961kt5KNdlZ/efSQUy9KaE4XP7BIykyyoQUc/6grgshHmV/lW5kcwzR93JYY4jzsT8o3EWR5JWtzlDCCb2HFA5HwZP7ceX2BRRjazGMDD+2NXu3Kh6B/so4LQlzB899Xs+zo9Ey6pWryochLsBvwT8zpuXVzcZKadU5ZLPmTAr5PsWgojl/K8szdm9Ia5dvCeWhHZ+RDQZvzf5dk61Nk22EDl7vd2j9UpVLODJEtf7XBy5m1Zd1QGl+Ske33KA3V/713k2W9VuxWtMz/G5+5jzbMmlvrT/W96/47kS941sD/93Kw1mGpX83CeHfaZJGkFKtuEPw=
 script:
-- if [ "${TRAVIS_TAG}" == "" ]; then export VERSION=HEAD;
-  else export VERSION=${TRAVIS_TAG:1}; fi; export BUILD=`git rev-parse HEAD`; echo
-  ${VERSION} ${BUILD}
+- if [ "${TRAVIS_TAG}" == "" ]; then export VERSION=HEAD; else export VERSION=${TRAVIS_TAG:1};
+  fi; export BUILD=`git rev-parse --short=8 HEAD`; echo ${VERSION} ${BUILD}
 - make build;
 - make test;
 - if [ "${VERSION}" != "HEAD" ]; then make dist; fi;
+after_success:
+- make docker-push
 notifications:
   email: false
 deploy:
-  provider: releases
+- provider: releases
   api_key:
     secure: aM92B9FJoRebhMpc6ffHSv7HEUFB+Q3JLDYufxrVzTwy7JhQ+Z1W7DtW3U9Dz7B1s7zj4glhv+BDkrAYrzmP54qdg5NDhzXoTQnA+BrDEGw1ll21GVexyYbEIUxUoUwFYyjudW83DiTUk2IaD5w3CgjkDrViVK/oe7pIQlNzrhgad17g8g1hp9UuFpJLAsPDwj44Ixl1/zHw5kSF8tAW2xrmaF4sX2NCshFrEhrFDPaxi70zN+NgHrX8DLsy+Q4U1xBM+xDcAx2tfdMBJS8mmz+39FjEqUk405XXb9P7j+nDgfPj5gc/F9bzHXclJsi9tgrlQVM/gIgHGl5UBBiuXpWbCMDYYodha2YUi11uXXR/r1JIm1ihib6kby1lSV79Xsg4ebIyUZrOTgImbQNpZwSMzQdd3+0GrNXJupBofJPF1DrcmraeFYtNgp/QNgb2FqeSEssQVMp5jR3DcOgwCksOt+yPx9Q730PcOQ2HOmQ2TygmWcGoLc8jGhICtJsXXAqvkbW1qdpYWlk6VmtDsmUx+LabQZ5zqPRi/8nZY/tKrUOQkaZaOTeZbDJKgqACmWxFb7Ha0bOwLd1koA8pss3o9/gMBOLFhnqIXjB04YCEFHUY14d8YGR8uzs71pU3gCZuQwJc4J3txYmSeWAj1bQ4DpPCmGAuV0gb2zJ/JHk=
   skip_cleanup: true
   overwrite: true
   file:
-    - dist/hello-http-go-${VERSION}-linux_amd64.tar.gz
-    - dist/hello-http-go-${VERSION}-linux_arm.tar.gz
-    - dist/hello-http-go-${VERSION}-darwin_amd64.tar.gz
+  - dist/hello-http-go-${VERSION}-linux_amd64.tar.gz
+  - dist/hello-http-go-${VERSION}-linux_arm.tar.gz
+  - dist/hello-http-go-${VERSION}-darwin_amd64.tar.gz
+  on:
+    repo: npetzall/hello-http-go
+    tags: true
+- provider: script
+  script: make docker-push-release
+  skip_cleanup: true
   on:
     repo: npetzall/hello-http-go
     tags: true
