@@ -27,7 +27,8 @@ type response struct {
 }
 
 func answer(w http.ResponseWriter, r *http.Request) {
-	data, err := json.Marshal(&response{Text: *text, Time: time.Now().Format("2006-01-02 15:04:05")})
+	log.Printf("Received request from: %s for: %s", r.RemoteAddr, r.RequestURI)
+	data, err := json.Marshal(&response{Text: *text, Time: time.Now().Format("2006-01-02 15:04:05.000")})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Error occured: %s", err.Error())

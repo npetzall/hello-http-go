@@ -58,18 +58,20 @@ notHEAD:
 			exit 1; \
 		fi
 
-docker-build: build-all
+docker-build: dist/linux_amd64/hello-http-go
+	$(call msg,"Building docker image")
 	docker build -f Dockerfile -t ${REPO}:${BUILD} --build-arg repo=${REPO} --build-arg build=${BUILD} .
 .PHONY: docker-build
 
 docker-push: docker-build
-	$(call msg, "Login to docker as ${DOCKER_USER}")
+	$(call msg, "Pushing docker image")
 	@docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker tag ${REPO}:${BUILD} ${REPO}:${VERSION}
 	docker push ${REPO}
 .PHONY: docker-push
 
 docker-push-release: docker-build
+	$(call msg, "Pushing docker release image")
 	docker tag ${REPO}:${BUILD} ${REPO}:latest
 	docker push ${REPO}:latest
 .PHONY: docker-push-release
