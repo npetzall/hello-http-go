@@ -67,7 +67,7 @@ docker-push: docker-build
 	$(call msg, "Pushing docker image")
 	@docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker tag ${REPO}:${BUILD} ${REPO}:${VERSION}
-	docker push ${REPO}
+	docker push ${REPO}:${VERSION}
 .PHONY: docker-push
 
 docker-push-release: docker-build
